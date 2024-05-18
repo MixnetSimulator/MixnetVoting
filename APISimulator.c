@@ -112,6 +112,8 @@ static void lerArquivoRDV (char RDVOutputName[20], uint32_t _m[VOTERS], int numV
 	FILE *RDVOutput;
 	uint32_t vote;
 
+	printf("going to fopen RDVOutputName=%s\n", RDVOutputName);
+
 	RDVOutput = fopen(RDVOutputName,"r");
 	if (RDVOutput != NULL) {
 		for (int i = 0; i < numVoters; i++) {
@@ -119,6 +121,9 @@ static void lerArquivoRDV (char RDVOutputName[20], uint32_t _m[VOTERS], int numV
 				_m[i]=vote;
 			}
 		}
+	}
+	else {
+		printf("can't fopen RDVOutputName=%s\n", RDVOutputName);
 	}
 	fclose(RDVOutput);
 }
@@ -277,7 +282,7 @@ void Setup() {
 
 	ec_null(key);
 	ec_new(key);
-
+//vog -rndinit RandomDevice /dev/urandom
 	system("vmni -prot -sid \"SessionID\" -name \"Election\" -nopart 1 -thres 1 -maxciph 600 stub.xml");
 	system("vmni -party -name \"MixServer\" stub.xml privInfo.xml localProtInfo.xml");
 	system("vmni -merge localProtInfo.xml protInfo.xml");
@@ -1008,11 +1013,17 @@ void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVote
 	bn_null(Signature[1]);
 	bn_new(Signature[1]);
 
+	printf("\nvalidateRDV RDVOutputName=%s; RDVSigOutputName=%s; numVoters=%d\n", RDVOutputName, RDVSigOutputName, numVoters);
+
 	SigFile = fopen("publicSignatureKey", "r");
 	if(SigFile != NULL){
 		fread(buffer, sizeof(uint8_t), 64, SigFile);
 		fclose(SigFile);
 	}
+	else {
+		printf("publicSignatureKey null\n");
+	}
+
 	fp_read_bin(publicKey->x,buffer,32);
 	fp_read_bin(publicKey->y,buffer+32,32);
 	fp_read_str(publicKey->z,"1",1,16);
@@ -1024,7 +1035,9 @@ void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVote
 	
 
 	SHA256Reset(&sha);
+
 	lerArquivoRDV(RDVOutputName,_m,numVoters);
+
 	for (int i = 0; i < numVoters; i++) {
 		SHA256Input(&sha, (const uint8_t*)&_m[i], 4);
 		SHA256Input(&sha, (const uint8_t*)"\n", 2);
@@ -1035,7 +1048,12 @@ void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVote
 	if(SigFile != NULL){
 		fread(buffer, sizeof(uint8_t), 64, SigFile);
 		fclose(SigFile);
+		printf("RDVSigOutputName opened\n");
 	}
+	else {
+		printf("RDVSigOutputName null\n");
+	}
+
 	bn_read_bin(Signature[0],buffer,32);
 	bn_read_bin(Signature[1],buffer+32,32);
 
