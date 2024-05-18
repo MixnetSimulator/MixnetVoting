@@ -3,8 +3,8 @@
 int main(int argc, char *arg[]) {
   	uint32_t vote;
 	uint8_t infoContest=0x3f;
-	uint8_t HTail[SHA256HashSize], HHead[SHA256HashSize], HTrack[VOTERS][SHA256HashSize];
-	time_t vTime[VOTERS];
+//	uint8_t HTail[SHA256HashSize], HHead[SHA256HashSize], HTrack[VOTERS][SHA256HashSize];
+//	time_t vTime[VOTERS];
 	int totalVoters, tamQR;
 	int chal;
 	int proxEleitor;

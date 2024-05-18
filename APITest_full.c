@@ -75,7 +75,7 @@ int main(int argc, char *arg[]) {
 					}
 					printf("\n\n");
 
-					verifyVote(QRCodeTrackingCode,QRCodeSpoilTrackingCode,QRCodeSpoilNonce,QRCodeSpoilVotes);
+//					verifyVote(QRCodeTrackingCode,QRCodeSpoilTrackingCode,QRCodeSpoilNonce,QRCodeSpoilVotes);
 					chal = 0;
 				} else {
 					onChallenge (TRUE);

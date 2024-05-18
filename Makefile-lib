@@ -1,0 +1,26 @@
+AR = ar
+CPP = g++
+CFLAGS = -O3 -march=native -mtune=native -Wall -ggdb -pthread
+INCLUDES = bench.h cpucycles.h
+BENCH = bench.c cpucycles.c
+TEST = test.c
+GAUSSIAN = gaussian.o fastrandombytes.c randombytes.c
+LIBS = -lflint -lgmp -lrelic
+DIL_LIBS = -lpqcrystals_dilithium2_ref -lpqcrystals_dilithium3_ref -lpqcrystals_dilithium5_ref -lpqcrystals_dilithium2aes_ref \
+	-lpqcrystals_dilithium3aes_ref -lpqcrystals_dilithium5aes_ref -lpqcrystals_fips202_ref -lpqcrystals_aes256ctr_ref
+DILITHIUM_PATH = ./dilithium/ref/
+RELIC_PATH = /usr/local/lib/
+
+all: Mixnet_lib APITest
+
+Mixnet_lib: APISimulator.c APISimulator.h
+	${CPP} ${CFLAGS} -I${RELIC_PATH} -fPIC -c APISimulator.c sha224-256.c sha384-512.c
+	${AR} rcs libmixnet.a APISimulator.o sha224-256.o sha384-512.o
+
+APITest: APITest.c APISimulator.c APISimulator.h
+	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APITest.c -L./ -lmixnet ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
+
+
+
+clean:
+	rm *.o *.a APITest

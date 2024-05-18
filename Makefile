@@ -42,6 +42,9 @@ votingSimulator: votingSimulator.c commit.c ${TEST} ${BENCH}
 APISimulator: APITest.c APISimulator.c APISimulator.h
 	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APITest.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
 
+APITest_full: APITest_full.c APISimulator.c APISimulator.h
+	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APITest_full.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest_full -Wl,-R${RELIC_PATH}
+
 APIBench: APIBench.c APISimulator.c APISimulator.h
 	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APIBench.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APIBench -Wl,-R${RELIC_PATH}
 
@@ -51,4 +54,4 @@ spoilCheck: spoilCheck.c commit.c ${TEST} ${BENCH}
 	${CPP} ${CFLAGS} -DMAIN spoilCheck.c commit.o sha224-256.c ${GAUSSIAN} ${TEST} ${BENCH} -o spoilCheck ${LIBS}
 
 clean:
-	rm *.o commit encrypt vericrypt shuffle voting spoilCheck votingSimulator APISimulator APITest APIBench
+	rm *.o commit encrypt vericrypt shuffle voting spoilCheck votingSimulator APISimulator APITest APIBench APITest_full
