@@ -29,7 +29,7 @@ static uint8_t trackingCode[CONTESTS][SHA256HashSize];
 static uint8_t voteContestCasted;
 static uint8_t numberContests;
 uint8_t QRCodeTrackingCode[CONTESTS*(SHA256HashSize+sizeof(uint32_t))];
-static int tamQRCodeTrackingCode;
+int tamQRCodeTrackingCode;
 uint8_t QRCodeSpoilTrackingCode[CONTESTS*SHA256HashSize];
 uint8_t QRCodeSpoilNonce[CONTESTS*32]; // size of nonce for EC
 uint32_t QRCodeSpoilVotes[CONTESTS];
