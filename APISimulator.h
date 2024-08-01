@@ -38,15 +38,18 @@ extern uint8_t QRCodeSpoilTrackingCode[CONTESTS*SHA256HashSize];
 extern uint8_t QRCodeSpoilNonce[CONTESTS*32]; // Degree*2/8
 extern uint32_t QRCodeSpoilVotes[CONTESTS];
 extern int sizeQRCodeSpoil[3];
-
+extern uint8_t bufferPK[2][32];
 /*============================================================================*/
 /* Function prototypes                                                        */
 /*============================================================================*/
 
 /**
  * Create commitment key for use in the simulator.
+ * @param[in] newSession          - TRUE: Create a new Verificatum session; FALSE: reuse already created
+ * @param[in] readPKFile          - TRUE: Read the privateKey file; FALSE: expects the privateKey to be set before in bufferPK variable; for a new session, must be TRUE
+
 */
-void Setup();
+void Setup(bool newSession, bool readPKFile);
 
 
 /**
@@ -106,9 +109,9 @@ int numberTotalvoters();
  * @param[in] QRSpoilTrack      - Tracking Code of the previous voter, provided by the challenge.
  * @param[in] QRSpoilNon 		- Nonce used to create the commitment, provided by the challenge.
  * @param[in] QRSpoilVot 		- Votes used to create the commitment, provided by the challenge.
+ * @param[in] numberContestsPar - 6 less significant bits: set if contest is held, clear otherwise.
  */
-void verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, uint32_t *QRSpoilVot);
-
+int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, uint32_t *QRSpoilVot, uint8_t numberContestsPar);
 
 /**
  * Validate the signature of the RDV file.

@@ -35,6 +35,8 @@ uint8_t QRCodeSpoilNonce[CONTESTS*32]; // size of nonce for EC
 uint32_t QRCodeSpoilVotes[CONTESTS];
 int sizeQRCodeSpoil[3];
 
+uint8_t bufferPK[2][32];
+
 static void initializeVoteTable(VoteTable *vTable){
 	ec_null(a);
 	ec_null(b);
@@ -271,11 +273,34 @@ static void lerArquivoRDV (char RDVOutputName[20], uint32_t _m[VOTERS], int numV
 
 // }
 
-
-
-void Setup() {
+void readPK() {
 	FILE *keyFile;
-	uint8_t buffer[32];
+	printf("readPK()\n");
+	keyFile = fopen("publicKey", "rb");
+	if (keyFile != NULL) {
+		fseek(keyFile,0x9A,SEEK_SET);
+		fread(bufferPK[0],1,sizeof(bufferPK[0]),keyFile);
+/*
+		for (int i = 0; i < 32; i++) {
+			printf("%02x ",bufferPK[0][i]);
+		}
+		printf("\n");*/
+		fseek(keyFile,0x6,SEEK_CUR);
+		fread(bufferPK[1],1,sizeof(bufferPK[1]),keyFile);
+/*
+		for (int i = 0; i < 32; i++) {
+			printf("%02x ",bufferPK[1][i]);
+		}
+		printf("\n");*/
+		fclose(keyFile);
+	}
+	else {
+		printf("Error opening keyFile!\n");
+	}
+}
+
+void Setup(bool newSession, bool readPKFile) {
+	printf("Setup()\n");
 	core_init();
 
 	ec_param_set_any();
@@ -283,10 +308,14 @@ void Setup() {
 	ec_null(key);
 	ec_new(key);
 //vog -rndinit RandomDevice /dev/urandom
-	system("vmni -prot -sid \"SessionID\" -name \"Election\" -nopart 1 -thres 1 -maxciph 600 stub.xml");
-	system("vmni -party -name \"MixServer\" stub.xml privInfo.xml localProtInfo.xml");
-	system("vmni -merge localProtInfo.xml protInfo.xml");
-	system("vmn -keygen -s privInfo.xml protInfo.xml publicKey");
+
+	if (newSession) {
+		system("vmni -prot -sid \"SessionID\" -name \"Election\" -nopart 1 -thres 1 -maxciph 600 stub.xml");
+		system("vmni -party -name \"MixServer\" stub.xml privInfo.xml localProtInfo.xml");
+		system("vmni -merge localProtInfo.xml protInfo.xml");
+		system("vmn -keygen -s privInfo.xml protInfo.xml publicKey");
+	}
+
 	// system("vmn -precomp -s -auxsid \"mix0\"  privInfo.xml protInfo.xml");
 	// system("vmn -precomp -s -auxsid \"mix1\"  privInfo.xml protInfo.xml");
 	// system("vmn -precomp -s -auxsid \"mix2\"  privInfo.xml protInfo.xml");
@@ -294,41 +323,20 @@ void Setup() {
 	// system("vmn -precomp -s -auxsid \"mix4\"  privInfo.xml protInfo.xml");
 	// system("vmn -precomp -s -auxsid \"mix5\"  privInfo.xml protInfo.xml");
 
-	keyFile = fopen("publicKey", "rb");
-	if (keyFile != NULL) {
-		key->coord = 1;
-
-		fseek(keyFile,0x9A,SEEK_SET);
-		fread(buffer,1,32,keyFile);
-		fp_read_bin(key->x,buffer,32);
-		// for (int i = 0; i < 32; i++) {
-		// 	printf("%02x ",buffer[i]);
-		// }
-		// printf("\n");
-
-		fseek(keyFile,0x6,SEEK_CUR);
-		fread(buffer,1,32,keyFile);
-		fp_read_bin(key->y,buffer,32);
-		// for (int i = 0; i < 32; i++) {
-		// 	printf("%02x ",buffer[i]);
-		// }
-		// printf("\n");
-
-		fp_read_str(key->z,"1",1,16);
-
-		fclose(keyFile);
-	}
-	else {
-		printf("Error opening keyFile!\n");
-	}
-
-
-	// ec_print(key);
-
 	for (int i = 0; i < 32; i++) {
 		ec_null(keyTable[i]);
 		ec_new(keyTable[i]);
 	}
+
+	if (readPKFile) {
+		readPK();
+	}
+
+	key->coord = 1;
+	fp_read_bin(key->x,bufferPK[0],32);
+	fp_read_bin(key->y,bufferPK[1],32);
+	fp_read_str(key->z,"1",1,16);
+	// ec_print(key);
 	ec_mul_pre(keyTable,key);
 
 	bn_null(curveMod);
@@ -864,7 +872,7 @@ int createQRTrackingCode() {
 
 
 
-void verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, uint32_t *QRSpoilVot) {
+int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, uint32_t *QRSpoilVot, uint8_t numberContestsPar = 0) {
 	SHA256Context sha;
 	ec_t _a[CONTESTS];
 	ec_t _b[CONTESTS];
@@ -883,12 +891,20 @@ void verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, u
 	uint32_t QRSpoilVotes[CONTESTS];
 	uint8_t numberActiveContests=0;
 
+
+	if (numberContestsPar>0) {
+		numberContests = numberContestsPar;
+	}
+
 	/* Initialize internal vectors with external vectors*/
 	for (uint8_t cont = 0; cont < CONTESTS; cont++) {
 			if (((numberContests >> cont) & 1) == 1) {
 				numberActiveContests++;
 			}
 	}
+
+//	printf("SHA256HashSize=%u numberActiveContests=%u numberContests=%u\n", SHA256HashSize, numberActiveContests, numberContests);
+
 	memmove(QRTrackingCode,QRTrack,numberActiveContests*(SHA256HashSize+sizeof(uint32_t)));
 	memmove(QRSpoilTrackingCode,QRSpoilTrack,numberActiveContests*SHA256HashSize);
 	memmove(QRSpoilNonce, QRSpoilNon, numberActiveContests*32);
@@ -911,8 +927,8 @@ void verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, u
 		tempVote[3]=(QRSpoilVotes[cont]>>24)&0xFF;
 
 		ec_map(P,tempVote,4);
-		bn_read_bin(_r[cont],(QRCodeSpoilNonce + cont*32),32);
-		
+		bn_read_bin(_r[cont],(QRSpoilNonce + cont*32),32);
+
 		ec_mul_gen(_a[cont],_r[cont]);
 		ec_mul_fix(_b[cont],keyTable,_r[cont]);
 		ec_add(_b[cont],_b[cont],P);
@@ -944,6 +960,7 @@ void verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, u
 		SHA256Result(&sha, newTrCode[cont]);
 
 		for (int z = 0; z < SHA256HashSize; z++){
+//			printf("newTrCode=% 3u	QRTrackingCode=% 3u\n", newTrCode[cont][z], QRTrackingCode[cont*(SHA256HashSize+sizeof(uint32_t))+z]);
 			if(newTrCode[cont][z]!=QRTrackingCode[cont*(SHA256HashSize+sizeof(uint32_t))+z]) {
 				verified=FALSE;
 			}
@@ -962,7 +979,8 @@ void verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, u
 		ec_free(_b[cont]);
 	}
 	ec_free(P);
-	
+
+	return verified;
 }
 
 void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVoters){
