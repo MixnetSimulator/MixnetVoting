@@ -909,6 +909,38 @@ int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, ui
 	memmove(QRSpoilTrackingCode,QRSpoilTrack,numberActiveContests*SHA256HashSize);
 	memmove(QRSpoilNonce, QRSpoilNon, numberActiveContests*32);
 	memmove(QRSpoilVotes, QRSpoilVot, numberActiveContests*4);
+/*
+	printf("bufferPK=\n");
+    for (int i=0; i<(sizeof(bufferPK));i++) {
+        printf("[%03d]=%u\n", i, ((uint8_t *)bufferPK)[i]);
+    }
+
+	printf("QRTrackingCode=\n");
+    for (int i=0; i<(sizeof(QRTrackingCode));i++) {
+        printf("[%03d]=%u\n", i, QRTrackingCode[i]);
+    }
+
+	printf("QRSpoilTrackingCode=\n");
+    for (int i=0; i<(sizeof(QRSpoilTrackingCode));i++) {
+        printf("[%03d]=%u\n", i, QRSpoilTrackingCode[i]);
+    }
+
+	printf("QRSpoilNonce=\n");
+    for (int i=0; i<(sizeof(QRSpoilNonce));i++) {
+        printf("[%03d]=%u\n", i, QRSpoilNonce[i]);
+    }
+
+	printf("QRSpoilVotes=\n");
+    for (int i=0; i<(numberActiveContests);i++) {
+        printf("[%d]=%lu\n", i, QRSpoilVotes[i]);
+    }
+
+	printf("keyTable=\n");
+
+	for (int i = 0; i < 32; i++) {
+		ec_print(keyTable[i]);
+	}
+*/
 
 	ec_null(P);
 	ec_new(P);
