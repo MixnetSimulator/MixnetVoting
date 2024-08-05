@@ -19,3 +19,5 @@ build/config.gypi
 shuffle
 encrypt
 voting
+node_modules/.yarn-integrity
+.gitignore
