@@ -116,11 +116,12 @@ int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, ui
 /**
  * Validate the signature of the RDV file.
  * Print the result on screen.
+ * @param[in] publicSignatureKeyName - Name of the publicSignatureKey.
  * @param[in] RDVOutputName 		- Name of the RDV file.
  * @param[in] RDVSigOutputName 		- Name of the file that contains the signature for the RDV file.
  * @param[in] numVoters 			- Number of voters.
  */
-void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVoters);
+int validateRDV (char publicSignatureKeyName[], char RDVOutputName[20], char RDVSigOutputName[20], int numVoters);
 
 
 /**

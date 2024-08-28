@@ -903,7 +903,7 @@ int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, ui
 			}
 	}
 
-//	printf("SHA256HashSize=%u numberActiveContests=%u numberContests=%u\n", SHA256HashSize, numberActiveContests, numberContests);
+	printf("SHA256HashSize=%u numberActiveContests=%u numberContests=%u\n", SHA256HashSize, numberActiveContests, numberContests);
 
 	memmove(QRTrackingCode,QRTrack,numberActiveContests*(SHA256HashSize+sizeof(uint32_t)));
 	memmove(QRSpoilTrackingCode,QRSpoilTrack,numberActiveContests*SHA256HashSize);
@@ -934,13 +934,13 @@ int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, ui
     for (int i=0; i<(numberActiveContests);i++) {
         printf("[%d]=%lu\n", i, QRSpoilVotes[i]);
     }
-
+*/
 	printf("keyTable=\n");
 
 	for (int i = 0; i < 32; i++) {
 		ec_print(keyTable[i]);
 	}
-*/
+
 
 	ec_null(P);
 	ec_new(P);
@@ -992,7 +992,7 @@ int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, ui
 		SHA256Result(&sha, newTrCode[cont]);
 
 		for (int z = 0; z < SHA256HashSize; z++){
-//			printf("newTrCode=% 3u	QRTrackingCode=% 3u\n", newTrCode[cont][z], QRTrackingCode[cont*(SHA256HashSize+sizeof(uint32_t))+z]);
+			printf("newTrCode=% 3u	QRTrackingCode=% 3u\n", newTrCode[cont][z], QRTrackingCode[cont*(SHA256HashSize+sizeof(uint32_t))+z]);
 			if(newTrCode[cont][z]!=QRTrackingCode[cont*(SHA256HashSize+sizeof(uint32_t))+z]) {
 				verified=FALSE;
 			}
@@ -1015,7 +1015,7 @@ int verifyVote (uint8_t *QRTrack, uint8_t *QRSpoilTrack, uint8_t *QRSpoilNon, ui
 	return verified;
 }
 
-void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVoters){
+int validateRDV (char publicSignatureKeyName[], char RDVOutputName[20], char RDVSigOutputName[20], int numVoters){
 	FILE *SigFile;
 	SHA256Context sha;
 	uint8_t hash[SHA256HashSize];
@@ -1036,9 +1036,9 @@ void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVote
 	bn_null(Signature[1]);
 	bn_new(Signature[1]);
 
-	printf("\nvalidateRDV RDVOutputName=%s; RDVSigOutputName=%s; numVoters=%d\n", RDVOutputName, RDVSigOutputName, numVoters);
+	printf("\nvalidateRDV publicSignatureKeyName=%s; RDVOutputName=%s; RDVSigOutputName=%s; numVoters=%d\n", publicSignatureKeyName, RDVOutputName, RDVSigOutputName, numVoters);
 
-	SigFile = fopen("publicSignatureKey", "r");
+	SigFile = fopen(publicSignatureKeyName, "r");
 	if(SigFile != NULL){
 		fread(buffer, sizeof(uint8_t), 64, SigFile);
 		fclose(SigFile);
@@ -1092,6 +1092,8 @@ void validateRDV (char RDVOutputName[20], char RDVSigOutputName[20], int numVote
 	bn_free(Signature[0]);
 	bn_free(Signature[1]);
 	core_clean();
+
+	return Success;
 }
 
 void validateVoteOutput (char voteOutputName[20], char voteSigOutputName[20], int numVoters){

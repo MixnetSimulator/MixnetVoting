@@ -8,7 +8,8 @@ LIBS = -lflint -lgmp -lrelic
 DIL_LIBS = -lpqcrystals_dilithium2_ref -lpqcrystals_dilithium3_ref -lpqcrystals_dilithium5_ref -lpqcrystals_dilithium2aes_ref \
 	-lpqcrystals_dilithium3aes_ref -lpqcrystals_dilithium5aes_ref -lpqcrystals_fips202_ref -lpqcrystals_aes256ctr_ref
 DILITHIUM_PATH = ./dilithium/ref/
-RELIC_PATH = /usr/local/lib/
+RELIC_INCLUDES = -I ../relic-target/include -I ../relic/include -L ../relic-target/lib
+RELIC_PATH = ../relic-target/lib
 
 all: commit encrypt vericrypt shuffle voting
 vote: voting spoilCheck
@@ -40,13 +41,13 @@ votingSimulator: votingSimulator.c commit.c ${TEST} ${BENCH}
 	${CPP} ${CFLAGS} -DMAIN votingSimulator.c commit.o sha224-256.c sha384-512.c ${GAUSSIAN} ${TEST} ${BENCH} -o votingSimulator ${LIBS}
 
 APISimulator: APITest.c APISimulator.c APISimulator.h
-	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APITest.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
+	${CPP} ${CFLAGS} -L${RELIC_INCLUDES} APITest.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
 
 APITest_full: APITest_full.c APISimulator.c APISimulator.h
-	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APITest_full.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest_full -Wl,-R${RELIC_PATH}
+	${CPP} ${CFLAGS} ${RELIC_INCLUDES} APITest_full.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest_full -Wl,-R${RELIC_PATH}
 
 APIBench: APIBench.c APISimulator.c APISimulator.h
-	${CPP} ${CFLAGS} -L${RELIC_PATH} -I${RELIC_PATH} APIBench.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APIBench -Wl,-R${RELIC_PATH}
+	${CPP} ${CFLAGS} ${RELIC_INCLUDES} APIBench.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APIBench -Wl,-R${RELIC_PATH}
 
 spoilCheck: spoilCheck.c commit.c ${TEST} ${BENCH}
 	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_C -c gaussian_ct.cpp -o gaussian.o
