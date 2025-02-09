@@ -1,46 +1,12 @@
 CPP = g++
 CFLAGS = -O3 -march=native -mtune=native -Wall -ggdb -pthread
-INCLUDES = bench.h cpucycles.h
-BENCH = bench.c cpucycles.c
-TEST = test.c
-GAUSSIAN = gaussian.o fastrandombytes.c randombytes.c
-LIBS = -lflint -lgmp -lrelic
-DIL_LIBS = -lpqcrystals_dilithium2_ref -lpqcrystals_dilithium3_ref -lpqcrystals_dilithium5_ref -lpqcrystals_dilithium2aes_ref \
-	-lpqcrystals_dilithium3aes_ref -lpqcrystals_dilithium5aes_ref -lpqcrystals_fips202_ref -lpqcrystals_aes256ctr_ref
-DILITHIUM_PATH = ./dilithium/ref/
+LIBS = -lrelic
 RELIC_INCLUDES = -I ../relic-target/include -I ../relic/include -L ../relic-target/lib
 RELIC_PATH = ../relic-target/lib
 
-all: commit encrypt vericrypt shuffle voting
-vote: voting spoilCheck
+all: Mixnet_lib APITest APITest_full APIBench APITestLib
 
-commit: commit.c ${TEST} ${BENCH} ${INCLUDES} gaussian_ct.cpp
-	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_C -c gaussian_ct.cpp -o gaussian.o
-	${CPP} ${CFLAGS} -DMAIN commit.c ${GAUSSIAN} ${TEST} ${BENCH} -o commit ${LIBS}
-
-encrypt: encrypt.c ${TEST} ${BENCH} ${INCLUDES}
-	${CPP} ${CFLAGS} -DMAIN encrypt.c ${TEST} ${BENCH} -o encrypt ${LIBS}
-
-vericrypt: vericrypt.c encrypt.c ${TEST} ${BENCH} ${INCLUDES} gaussian_ct.cpp
-	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_E -c gaussian_ct.cpp -o gaussian.o
-	${CPP} ${CFLAGS} -c encrypt.c -o encrypt.o
-	${CPP} ${CFLAGS} -DMAIN vericrypt.c encrypt.o sha224-256.c ${GAUSSIAN} ${TEST} ${BENCH} -o vericrypt ${LIBS}
-
-shuffle: shuffle.c commit.c ${TEST} ${BENCH}
-	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_C -c gaussian_ct.cpp -o gaussian.o
-	${CPP} ${CFLAGS} shuffle.c commit.c sha224-256.c ${GAUSSIAN} ${TEST} ${BENCH} -o shuffle ${LIBS}
-
-voting: voting.c commit.c ${TEST} ${BENCH}
-	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_C -c gaussian_ct.cpp -o gaussian.o
-	${CPP} ${CFLAGS} -c commit.c -o commit.o ${LIBS}
-	${CPP} ${CFLAGS} -DMAIN voting.c commit.o sha224-256.c sha384-512.c ${GAUSSIAN} ${TEST} ${BENCH} -o voting ${LIBS}
-
-votingSimulator: votingSimulator.c commit.c ${TEST} ${BENCH}
-	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_C -c gaussian_ct.cpp -o gaussian.o
-	${CPP} ${CFLAGS} -c commit.c -o commit.o ${LIBS}
-	${CPP} ${CFLAGS} -DMAIN votingSimulator.c commit.o sha224-256.c sha384-512.c ${GAUSSIAN} ${TEST} ${BENCH} -o votingSimulator ${LIBS}
-
-APISimulator: APITest.c APISimulator.c APISimulator.h
+APITest: APITest.c APISimulator.c APISimulator.h
 	${CPP} ${CFLAGS} ${RELIC_INCLUDES} APITest.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
 
 APITest_full: APITest_full.c APISimulator.c APISimulator.h
@@ -49,10 +15,12 @@ APITest_full: APITest_full.c APISimulator.c APISimulator.h
 APIBench: APIBench.c APISimulator.c APISimulator.h
 	${CPP} ${CFLAGS} ${RELIC_INCLUDES} APIBench.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APIBench -Wl,-R${RELIC_PATH}
 
-spoilCheck: spoilCheck.c commit.c ${TEST} ${BENCH}
-	${CPP} ${CFLAGS} -DSIGMA_PARAM=SIGMA_C -c gaussian_ct.cpp -o gaussian.o
-	${CPP} ${CFLAGS} -c commit.c -o commit.o ${LIBS}
-	${CPP} ${CFLAGS} -DMAIN spoilCheck.c commit.o sha224-256.c ${GAUSSIAN} ${TEST} ${BENCH} -o spoilCheck ${LIBS}
+Mixnet_lib: APISimulator.c APISimulator.h
+	${CPP} ${CFLAGS} ${RELIC_INCLUDES} -fPIC -c APISimulator.c sha224-256.c sha384-512.c
+	${AR} rcs libmixnet.a APISimulator.o sha224-256.o sha384-512.o
+
+APITestLib: APITest.c APISimulator.c APISimulator.h
+	${CPP} ${CFLAGS} ${RELIC_INCLUDES} -L${RELIC_PATH}  APITest.c -L./ -lmixnet ${LIBS} -o APITestLib -Wl,-R${RELIC_PATH}
 
 clean:
-	rm *.o commit encrypt vericrypt shuffle voting spoilCheck votingSimulator APISimulator APITest APIBench APITest_full
+	rm *.o *.a APITest APIBench APITest_full APITestLib; ./CleanSession.sh

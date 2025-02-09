@@ -53,7 +53,7 @@ int main(int argc, char *arg[]) {
 
 			t0 = rdtscp();
 			
-			Setup();
+			Setup(true, true);
 			t1 = rdtscp(); t = t1-t0;
 			fprintf(resultadoCycles, "%9lld;", t);
 

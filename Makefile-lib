@@ -1,14 +1,7 @@
 AR = ar
 CPP = g++
 CFLAGS = -O3 -march=native -mtune=native -Wall -ggdb -pthread
-INCLUDES = bench.h cpucycles.h
-BENCH = bench.c cpucycles.c
-TEST = test.c
-GAUSSIAN = gaussian.o fastrandombytes.c randombytes.c
-LIBS = -lflint -lgmp -lrelic
-DIL_LIBS = -lpqcrystals_dilithium2_ref -lpqcrystals_dilithium3_ref -lpqcrystals_dilithium5_ref -lpqcrystals_dilithium2aes_ref \
-	-lpqcrystals_dilithium3aes_ref -lpqcrystals_dilithium5aes_ref -lpqcrystals_fips202_ref -lpqcrystals_aes256ctr_ref
-DILITHIUM_PATH = ./dilithium/ref/
+LIBS = -lrelic
 RELIC_INCLUDES = -I ../relic-target/include -I ../relic/include -L ../relic-target/lib
 RELIC_PATH = ../relic-target/lib
 
