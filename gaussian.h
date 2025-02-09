@@ -1,1 +1,0 @@
-../E2Easy/gaussian.h

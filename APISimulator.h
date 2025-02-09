@@ -6,7 +6,7 @@
 #define _LARGE_TIME_API
 #include <time.h>
 
-#include <relic/relic.h>
+#include "relic.h"
 #include "sha.h"
 
 /*============================================================================*/

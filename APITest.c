@@ -16,7 +16,7 @@ int main(int argc, char *arg[]) {
 
 	printf("Demonstracao do sistema de votacao Mixnet\n\n");
 
-	Setup();
+	Setup(true, true);
 
 	onStart (infoContest);
 
@@ -174,7 +174,7 @@ int main(int argc, char *arg[]) {
 	if(totalVoters > 0) {
 		if ((infoContest & 0x1) != 0) {
 			printf("\n\n\nPara cargo Deputado Federal");
-			validateRDV("RDVOutput_Cont0", "RDVOutputSig_Cont0", totalVoters);
+			validateRDV("publicSignatureKey", "RDVOutput_Cont0", "RDVOutputSig_Cont0", totalVoters);
 
 			validateVoteOutput ("voteOutput_Cont0", "voteOutputSig_Cont0", totalVoters);
 
@@ -185,7 +185,7 @@ int main(int argc, char *arg[]) {
 
 		if ((infoContest & 0x2) != 0) {
 			printf("\n\n\nPara cargo Deputado Estadual");
-			validateRDV("RDVOutput_Cont1", "RDVOutputSig_Cont1", totalVoters);
+			validateRDV("publicSignatureKey", "RDVOutput_Cont1", "RDVOutputSig_Cont1", totalVoters);
 
 			validateVoteOutput ("voteOutput_Cont1", "voteOutputSig_Cont1", totalVoters);
 
@@ -196,7 +196,7 @@ int main(int argc, char *arg[]) {
 
 		if ((infoContest & 0x4) != 0) {
 			printf("\n\n\nPara cargo Senador 1");
-			validateRDV("RDVOutput_Cont2", "RDVOutputSig_Cont2", totalVoters);
+			validateRDV("publicSignatureKey", "RDVOutput_Cont2", "RDVOutputSig_Cont2", totalVoters);
 
 			validateVoteOutput ("voteOutput_Cont2", "voteOutputSig_Cont2", totalVoters);
 
@@ -207,7 +207,7 @@ int main(int argc, char *arg[]) {
 
 		if ((infoContest & 0x8) != 0) {
 			printf("\n\n\nPara cargo Senador 2");
-			validateRDV("RDVOutput_Cont3", "RDVOutputSig_Cont3", totalVoters);
+			validateRDV("publicSignatureKey", "RDVOutput_Cont3", "RDVOutputSig_Cont3", totalVoters);
 
 			validateVoteOutput ("voteOutput_Cont3", "voteOutputSig_Cont3", totalVoters);
 
@@ -218,7 +218,7 @@ int main(int argc, char *arg[]) {
 
 		if ((infoContest & 0x10) != 0) {
 			printf("\n\n\nPara cargo Governador");
-			validateRDV("RDVOutput_Cont4", "RDVOutputSig_Cont4", totalVoters);
+			validateRDV("publicSignatureKey", "RDVOutput_Cont4", "RDVOutputSig_Cont4", totalVoters);
 
 			validateVoteOutput ("voteOutput_Cont4", "voteOutputSig_Cont4", totalVoters);
 
@@ -229,7 +229,7 @@ int main(int argc, char *arg[]) {
 
 		if ((infoContest & 0x20) != 0) {
 			printf("\n\n\nPara cargo Presidente");
-			validateRDV("RDVOutput_Cont5", "RDVOutputSig_Cont5", totalVoters);
+			validateRDV("publicSignatureKey", "RDVOutput_Cont5", "RDVOutputSig_Cont5", totalVoters);
 
 			validateVoteOutput ("voteOutput_Cont5", "voteOutputSig_Cont5", totalVoters);
 

@@ -41,7 +41,7 @@ votingSimulator: votingSimulator.c commit.c ${TEST} ${BENCH}
 	${CPP} ${CFLAGS} -DMAIN votingSimulator.c commit.o sha224-256.c sha384-512.c ${GAUSSIAN} ${TEST} ${BENCH} -o votingSimulator ${LIBS}
 
 APISimulator: APITest.c APISimulator.c APISimulator.h
-	${CPP} ${CFLAGS} -L${RELIC_INCLUDES} APITest.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
+	${CPP} ${CFLAGS} ${RELIC_INCLUDES} APITest.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest -Wl,-R${RELIC_PATH}
 
 APITest_full: APITest_full.c APISimulator.c APISimulator.h
 	${CPP} ${CFLAGS} ${RELIC_INCLUDES} APITest_full.c APISimulator.c sha224-256.c sha384-512.c ${LIBS} -o APITest_full -Wl,-R${RELIC_PATH}

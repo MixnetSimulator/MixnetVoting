@@ -14,7 +14,7 @@ int main(int argc, char *arg[]) {
 				printf("Teste = %d\n",i);
 			}
 
-			Setup();
+			Setup(true, true);
 		
 			onStart (infoContest);
 
