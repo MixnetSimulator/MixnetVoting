@@ -27,8 +27,8 @@ int main(int argc, char *arg[]) {
 
 	if(vote == 1) {
 		do {
-		printf("\nSelecionar a quantidade de eleitores: ");
-		scanf("%d", &eleitoresHabilitados);
+			printf("\nSelecionar a quantidade de eleitores: ");
+			scanf("%d", &eleitoresHabilitados);
 		} while (eleitoresHabilitados < 0);
 		for (int i = 0; i < eleitoresHabilitados; i++) {
 			getrandom(&vote, sizeof(vote), 0);
@@ -145,6 +145,7 @@ int main(int argc, char *arg[]) {
 				for (int i = 0; i < sizeQRCodeSpoil[2]; i++) {
 					printf("%lld ", QRCodeSpoilVotes[i]);
 				}
+				verifyVote(QRCodeTrackingCode,QRCodeSpoilTrackingCode,QRCodeSpoilNonce,QRCodeSpoilVotes, 0);
 			} else {
 				printf("\n\nSignature ECDSA P-256\n");
 				printf("r = ");

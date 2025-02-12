@@ -741,8 +741,10 @@ void onFinish () {
 					fwrite(Phex,sizeof(uint8_t),32,voteOutput);
 				}
 				fclose(voteOutput);
-				snprintf(verificatumCmd,100,"vmn -mix -auxsid \"mix%d\" -s privInfo.xml protInfo.xml %s plaintexts_%d", cont, aggrCiphertexts,cont);
-				system(verificatumCmd);
+				if (voteNumber>0) {
+					snprintf(verificatumCmd,100,"vmn -mix -auxsid \"mix%d\" -s privInfo.xml protInfo.xml %s plaintexts_%d", cont, aggrCiphertexts,cont);
+					system(verificatumCmd);
+				}
 			} else {
 				printf("Error in creating ciphertexts list\n");
 			}
